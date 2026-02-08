@@ -1,0 +1,55 @@
+<div class="success-container">
+    <div class="success-content">
+        <div class="success-icon">
+            <span class="checkmark">✓</span>
+        </div>
+
+        <h1 class="success-title">
+            <span class="gradient-text">Configuration Complete!</span>
+        </h1>
+        <p class="success-desc">
+            Your API integration has been successfully configured and is ready to use.
+        </p>
+
+        <div class="summary-card glass-card">
+            <div class="summary-item">
+                <span class="summary-label">Customer</span>
+                <span class="summary-value">{{ config.customer.name }}</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+                <span class="summary-label">Environment</span>
+                <span class="summary-value badge">{{ config.customer.environment | uppercase }}</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+                <span class="summary-label">Draft ID</span>
+                <span class="summary-value summary-value--mono">{{ config.meta.draftId }}</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+                <span class="summary-label">Last Updated</span>
+                <span class="summary-value">{{ config.meta.updatedAt | date:'medium' }}</span>
+            </div>
+        </div>
+
+        <div class="success-actions">
+            <button type="button" class="btn btn--primary btn--lg" (click)="downloadConfig()">
+                <span class="btn__icon">📥</span>
+                Download Config JSON
+            </button>
+            <button type="button" class="btn btn--secondary btn--lg" (click)="goDashboard()">
+                <span class="btn__icon">🏠</span>
+                Back to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <div class="confetti-wrapper">
+        <div class="confetti confetti--1"></div>
+        <div class="confetti confetti--2"></div>
+        <div class="confetti confetti--3"></div>
+        <div class="confetti confetti--4"></div>
+        <div class="confetti confetti--5"></div>
+    </div>
+</div>

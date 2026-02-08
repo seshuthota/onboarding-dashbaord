@@ -1,0 +1,48 @@
+<div class="dashboard-container">
+  <div class="hero">
+    <div class="hero__content">
+      <h1 class="hero__title">
+        <span class="gradient-text">Customer Onboarding</span>
+        <br />Dashboard
+      </h1>
+      <p class="hero__desc">
+        Configure API integration settings for seamless order status tracking and data synchronization.
+      </p>
+
+      <div class="hero__actions">
+        <button type="button" class="btn btn--primary btn--lg" (click)="startNew()">
+          <span class="btn__icon">🚀</span>
+          Create New Integration
+        </button>
+        @if (onboardingState.hasDraft()) {
+        <button type="button" class="btn btn--secondary btn--lg" (click)="continueDraft()">
+          <span class="btn__icon">📝</span>
+          Continue Draft
+        </button>
+        }
+      </div>
+    </div>
+
+    <div class="hero__visual">
+      <div class="glow-orb glow-orb--1"></div>
+      <div class="glow-orb glow-orb--2"></div>
+      <div class="feature-cards">
+        <div class="feature-card glass-card">
+          <div class="feature-card__icon">🔐</div>
+          <h3 class="feature-card__title">Multi-Auth Support</h3>
+          <p class="feature-card__desc">Basic, Bearer, OAuth2, API Key</p>
+        </div>
+        <div class="feature-card glass-card">
+          <div class="feature-card__icon">📦</div>
+          <h3 class="feature-card__title">JSON & XML</h3>
+          <p class="feature-card__desc">Flexible payload formats</p>
+        </div>
+        <div class="feature-card glass-card">
+          <div class="feature-card__icon">🔄</div>
+          <h3 class="feature-card__title">Field Mapping</h3>
+          <p class="feature-card__desc">Custom data transformations</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

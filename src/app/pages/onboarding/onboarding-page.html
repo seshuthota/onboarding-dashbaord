@@ -1,0 +1,393 @@
+<div class="onboarding-container">
+  <!-- Header with Customer Info -->
+  <header class="header glass-card">
+    <div class="header__brand">
+      <h1 class="header__title">
+        <span class="gradient-text">API Integration</span> Setup
+      </h1>
+      <p class="header__subtitle">Configure your integration settings</p>
+    </div>
+
+    <form [formGroup]="customerForm" class="header__form">
+      <div class="header__field">
+        <label class="field-label" for="customerName">Customer Name</label>
+        <input id="customerName" type="text" class="field-input" formControlName="name"
+          placeholder="Enter customer name" />
+      </div>
+
+      <div class="header__field">
+        <label class="field-label" for="environment">Environment</label>
+        <select id="environment" class="field-input field-select" formControlName="environment">
+          <option value="dev">Development</option>
+          <option value="uat">UAT</option>
+          <option value="prod">Production</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn btn--secondary" (click)="saveDraft()">
+        <span class="btn__icon">💾</span>
+        Save Draft
+      </button>
+    </form>
+  </header>
+
+  <!-- Tabs Navigation -->
+  <app-tabs [tabs]="tabs" [activeTabId]="activeTab" (tabChange)="onTabChange($event)" />
+
+  <!-- Tab Content -->
+  <main class="content glass-card animate-fade-in" [ngSwitch]="activeTab">
+
+    <!-- Format Tab -->
+    <section *ngSwitchCase="'format'" class="tab-content">
+      <div class="tab-header">
+        <h2 class="tab-title">Payload Format</h2>
+        <p class="tab-desc">Choose payload format and provide a sample for validation.</p>
+      </div>
+
+      <form [formGroup]="formatForm" class="form-grid">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="formatType">Format Type</label>
+            <select id="formatType" class="field-input field-select" formControlName="type"
+              (change)="validateFormatSyntax()">
+              <option value="json">JSON</option>
+              <option value="xml">XML</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label" for="samplePayload">Sample Payload / Schema</label>
+          <textarea id="samplePayload" class="field-input field-textarea code-textarea" rows="12"
+            formControlName="schemaOrSample" (blur)="validateFormatSyntax()"
+            placeholder="Paste your sample JSON or XML here..."></textarea>
+          @if (formatError) {
+          <span class="field-error">{{ formatError }}</span>
+          }
+        </div>
+      </form>
+    </section>
+
+    <!-- Auth Tab -->
+    <section *ngSwitchCase="'auth'" class="tab-content">
+      <div class="tab-header">
+        <h2 class="tab-title">Authentication</h2>
+        <p class="tab-desc">Select authentication type and provide credentials.</p>
+      </div>
+
+      <form [formGroup]="authForm" class="form-grid">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="authType">Auth Type</label>
+            <select id="authType" class="field-input field-select" formControlName="type">
+              <option value="none">No Auth</option>
+              <option value="basic">Basic Auth</option>
+              <option value="bearer">Bearer Token</option>
+              <option value="oauth2">OAuth 2.0</option>
+              <option value="apiKey">API Key</option>
+            </select>
+          </div>
+        </div>
+
+        @if (authType === 'basic') {
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="username">Username</label>
+            <input id="username" type="text" class="field-input" formControlName="username"
+              placeholder="Enter username" />
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="password">Password</label>
+            <input id="password" type="password" class="field-input" formControlName="password"
+              placeholder="Enter password" />
+          </div>
+        </div>
+        }
+
+        @if (authType === 'bearer') {
+        <div class="form-group">
+          <label class="field-label" for="token">Bearer Token</label>
+          <input id="token" type="text" class="field-input" formControlName="token" placeholder="Enter bearer token" />
+        </div>
+        }
+
+        @if (authType === 'oauth2') {
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="tokenUrl">Token URL</label>
+            <input id="tokenUrl" type="url" class="field-input" formControlName="tokenUrl"
+              placeholder="https://auth.example.com/token" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="clientId">Client ID</label>
+            <input id="clientId" type="text" class="field-input" formControlName="clientId"
+              placeholder="Enter client ID" />
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="clientSecret">Client Secret</label>
+            <input id="clientSecret" type="password" class="field-input" formControlName="clientSecret"
+              placeholder="Enter client secret" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label" for="scopes">Scopes</label>
+          <input id="scopes" type="text" class="field-input" formControlName="scopes"
+            placeholder="orders.read orders.write" />
+        </div>
+        }
+
+        @if (authType === 'apiKey') {
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="keyName">Key Name</label>
+            <input id="keyName" type="text" class="field-input" formControlName="keyName" placeholder="x-api-key" />
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="keyValue">Key Value</label>
+            <input id="keyValue" type="password" class="field-input" formControlName="keyValue"
+              placeholder="Enter API key value" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="placement">Placement</label>
+            <select id="placement" class="field-input field-select" formControlName="placement">
+              <option value="header">Header</option>
+              <option value="query">Query Parameter</option>
+            </select>
+          </div>
+        </div>
+        }
+      </form>
+    </section>
+
+    <!-- Request Tab -->
+    <section *ngSwitchCase="'request'" class="tab-content">
+      <div class="tab-header">
+        <h2 class="tab-title">Request Configuration</h2>
+        <p class="tab-desc">Configure API endpoint, method, timeout, and parameters.</p>
+      </div>
+
+      <form [formGroup]="requestForm" class="form-grid">
+        <div class="form-row">
+          <div class="form-group form-group--wide">
+            <label class="field-label" for="baseUrl">Base URL</label>
+            <input id="baseUrl" type="url" class="field-input" formControlName="baseUrl"
+              placeholder="https://api.customer.com" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label" for="endpoint">Endpoint Path</label>
+            <input id="endpoint" type="text" class="field-input" formControlName="endpoint"
+              placeholder="/orders/status" />
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="method">Method</label>
+            <select id="method" class="field-input field-select" formControlName="method">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="timeout">Timeout (ms)</label>
+            <input id="timeout" type="number" class="field-input" formControlName="timeoutMs" min="1000" />
+          </div>
+        </div>
+
+        <!-- Headers -->
+        <div class="collapsible-section">
+          <div class="section-header">
+            <h3 class="section-title">Headers</h3>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="addHeader()">+ Add Header</button>
+          </div>
+          <div formArrayName="headers" class="pairs-grid">
+            @for (item of headers.controls; track $index) {
+            <div [formGroupName]="$index" class="pair-row">
+              <input type="text" class="field-input" formControlName="key" placeholder="Header name" />
+              <input type="text" class="field-input" formControlName="value" placeholder="Header value" />
+              <button type="button" class="btn btn--danger btn--icon" (click)="removeHeader($index)">×</button>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Query Params -->
+        <div class="collapsible-section">
+          <div class="section-header">
+            <h3 class="section-title">Query Parameters</h3>
+            <button type="button" class="btn btn--ghost btn--sm" (click)="addQueryParam()">+ Add Param</button>
+          </div>
+          <div formArrayName="queryParams" class="pairs-grid">
+            @for (item of queryParams.controls; track $index) {
+            <div [formGroupName]="$index" class="pair-row">
+              <input type="text" class="field-input" formControlName="key" placeholder="Param name" />
+              <input type="text" class="field-input" formControlName="value" placeholder="Param value" />
+              <button type="button" class="btn btn--danger btn--icon" (click)="removeQueryParam($index)">×</button>
+            </div>
+            }
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Mapping Tab -->
+    <section *ngSwitchCase="'mapping'" class="tab-content">
+      <div class="tab-header">
+        <h2 class="tab-title">Field Mapping</h2>
+        <p class="tab-desc">Select a predefined mapping template for your integration.</p>
+      </div>
+
+      <form [formGroup]="mappingForm" class="form-grid">
+        <div class="form-row">
+          <div class="form-group form-group--wide">
+            <label class="field-label" for="mappingTemplate">Mapping Template</label>
+            <select id="mappingTemplate" class="field-input field-select" formControlName="templateId">
+              @for (template of mappingTemplates; track template.id) {
+              <option [value]="template.id">{{ template.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (selectedTemplate) {
+        <div class="template-preview glass-card">
+          <div class="template-preview__header">
+            <h3 class="template-preview__title">{{ selectedTemplate.name }}</h3>
+            <span class="badge badge--accent">{{ selectedTemplate.rules.length }} fields</span>
+          </div>
+          <p class="template-preview__desc">{{ selectedTemplate.description }}</p>
+          <div class="template-preview__mappings">
+            @for (rule of selectedTemplate.rules; track rule.sourceField) {
+            <div class="mapping-row">
+              <span class="mapping-row__source">{{ rule.sourceField }}</span>
+              <span class="mapping-row__arrow">→</span>
+              <span class="mapping-row__target">{{ rule.targetField }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </form>
+    </section>
+
+    <!-- Review Tab -->
+    <section *ngSwitchCase="'review'" class="tab-content">
+      <div class="tab-header">
+        <h2 class="tab-title">Review & Confirm</h2>
+        <p class="tab-desc">Verify your configuration before finalizing.</p>
+      </div>
+
+      <div class="review-grid">
+        <div class="review-card glass-card">
+          <div class="review-card__header">
+            <h3 class="review-card__title">Customer</h3>
+          </div>
+          <div class="review-card__body">
+            <div class="review-item">
+              <span class="review-item__label">Name</span>
+              <span class="review-item__value">{{ config.customer.name || '—' }}</span>
+            </div>
+            <div class="review-item">
+              <span class="review-item__label">Environment</span>
+              <span class="review-item__value badge">{{ config.customer.environment }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card glass-card">
+          <div class="review-card__header">
+            <h3 class="review-card__title">Format</h3>
+          </div>
+          <div class="review-card__body">
+            <div class="review-item">
+              <span class="review-item__label">Type</span>
+              <span class="review-item__value badge badge--accent">{{ config.format.type | uppercase }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card glass-card">
+          <div class="review-card__header">
+            <h3 class="review-card__title">Auth</h3>
+          </div>
+          <div class="review-card__body">
+            <div class="review-item">
+              <span class="review-item__label">Type</span>
+              <span class="review-item__value">{{ config.auth.type }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card glass-card">
+          <div class="review-card__header">
+            <h3 class="review-card__title">Request</h3>
+          </div>
+          <div class="review-card__body">
+            <div class="review-item">
+              <span class="review-item__label">URL</span>
+              <span class="review-item__value">{{ config.api.baseUrl }}{{ config.api.endpoint }}</span>
+            </div>
+            <div class="review-item">
+              <span class="review-item__label">Method</span>
+              <span class="review-item__value badge">{{ config.api.method }}</span>
+            </div>
+            <div class="review-item">
+              <span class="review-item__label">Timeout</span>
+              <span class="review-item__value">{{ config.api.timeoutMs }}ms</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-card glass-card">
+          <div class="review-card__header">
+            <h3 class="review-card__title">Mapping</h3>
+          </div>
+          <div class="review-card__body">
+            <div class="review-item">
+              <span class="review-item__label">Template</span>
+              <span class="review-item__value">{{ selectedTemplate?.name || '—' }}</span>
+            </div>
+            <div class="review-item">
+              <span class="review-item__label">Fields</span>
+              <span class="review-item__value badge badge--accent">{{ selectedTemplate?.rules?.length || 0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-preview">
+        <div class="config-preview__header">
+          <h3 class="section-title">Configuration JSON</h3>
+          <button type="button" class="btn btn--ghost btn--sm" (click)="copyConfig()">📋 Copy</button>
+        </div>
+        <pre class="config-preview__code">{{ configPreview }}</pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- Action Bar -->
+  <footer class="action-bar">
+    <button type="button" class="btn btn--secondary" (click)="goBack()">
+      ← Back to Dashboard
+    </button>
+    <div class="action-bar__right">
+      @if (activeTab !== 'format') {
+      <button type="button" class="btn btn--secondary" (click)="goPrevious()">Previous</button>
+      }
+      @if (activeTab !== 'review') {
+      <button type="button" class="btn btn--primary" (click)="goNext()">Next →</button>
+      } @else {
+      <button type="button" class="btn btn--primary btn--glow" (click)="submit()">✓ Confirm & Finish</button>
+      }
+    </div>
+  </footer>
+</div>
+
+<app-toast [message]="toastMessage" [type]="toastType" [(visible)]="toastVisible" />
