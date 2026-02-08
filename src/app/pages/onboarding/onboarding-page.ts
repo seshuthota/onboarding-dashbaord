@@ -112,8 +112,17 @@ export class OnboardingPageComponent implements OnInit {
     // Tab Navigation
     // ─────────────────────────────────────────────────────────────
     onTabChange(tabId: string): void {
+        const nextTab = tabId as TabId;
+        const currentIndex = this.tabs.findIndex(t => t.id === this.activeTab);
+        const nextIndex = this.tabs.findIndex(t => t.id === nextTab);
+
+        // Only enforce current-step validation when moving forward.
+        if (nextIndex > currentIndex && !this.validateCurrentTab()) {
+            return;
+        }
+
         this.persistCurrentTab();
-        this.activeTab = tabId as TabId;
+        this.activeTab = nextTab;
     }
 
     goNext(): void {
@@ -135,6 +144,10 @@ export class OnboardingPageComponent implements OnInit {
     }
 
     private validateCurrentTab(): boolean {
+        if (!this.validateCustomerSection()) {
+            return false;
+        }
+
         switch (this.activeTab) {
             case 'format':
                 if (this.formatForm.invalid) {
@@ -165,6 +178,48 @@ export class OnboardingPageComponent implements OnInit {
         }
     }
 
+    private validateCustomerSection(): boolean {
+        if (this.customerForm.invalid) {
+            this.customerForm.markAllAsTouched();
+            this.showToast('Please complete customer details before proceeding.', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    private validateAllSections(): boolean {
+        if (!this.validateCustomerSection()) {
+            return false;
+        }
+
+        if (this.formatForm.invalid || !this.validateFormatSyntax()) {
+            this.formatForm.markAllAsTouched();
+            this.activeTab = 'format';
+            return false;
+        }
+
+        if (this.authForm.invalid) {
+            this.authForm.markAllAsTouched();
+            this.activeTab = 'auth';
+            return false;
+        }
+
+        if (this.requestForm.invalid) {
+            this.requestForm.markAllAsTouched();
+            this.activeTab = 'request';
+            return false;
+        }
+
+        if (this.mappingForm.invalid) {
+            this.mappingForm.markAllAsTouched();
+            this.activeTab = 'mapping';
+            return false;
+        }
+
+        return true;
+    }
+
     private persistCurrentTab(): void {
         this.state.updateCustomer(this.customerForm.getRawValue() as { name: string; environment: 'dev' | 'uat' | 'prod' });
 
@@ -182,6 +237,14 @@ export class OnboardingPageComponent implements OnInit {
                 this.persistMapping();
                 break;
         }
+    }
+
+    private persistAllSections(): void {
+        this.state.updateCustomer(this.customerForm.getRawValue() as { name: string; environment: 'dev' | 'uat' | 'prod' });
+        this.state.updateFormat(this.formatForm.getRawValue() as { type: FormatType; schemaOrSample: string });
+        this.persistAuth();
+        this.persistRequest();
+        this.persistMapping();
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -366,8 +429,12 @@ export class OnboardingPageComponent implements OnInit {
     }
 
     submit(): void {
-        // Validate all tabs before submitting
-        this.persistCurrentTab();
+        if (!this.validateAllSections()) {
+            this.showToast('Please fix validation errors before finishing.', 'error');
+            return;
+        }
+
+        this.persistAllSections();
         this.state.saveDraft();
         this.router.navigateByUrl('/onboarding/success');
     }
